@@ -1,6 +1,6 @@
-// Computer Graphics Project
-//Shaswot Singh Adhikari 8333
-//Ashish Kayastha 8308
+// Computer Graphics Project - "Object Lighting"
+//Saurav Raj 1ST09CS091
+//Shailesh Man Joshi (@smjrifle) 1ST09CS085
 
 #include <stdlib.h>
 #include <GL/glut.h> // Header file for Graphics Library Utility Toolkit (GLUT)
@@ -25,6 +25,8 @@ static int xbegin, ybegin;
 static int object = TEAPOT;
 static int slices = 16;
 static int stacks = 16;
+int col=0;
+float teasize=40.0f;
 
 // Rotation amounts
 GLfloat xRot = 0.0f;
@@ -34,7 +36,7 @@ GLfloat yRot = 0.0f;
 GLfloat	 lightPos[] = { 0.0f, 0.0f, 75.0f, 1.0f };
 GLfloat  specular[] = { 1.0f, 1.0f, 1.0f, 1.0f};
 GLfloat  specref[] =  { 1.0f, 1.0f, 1.0f, 1.0f };
-GLfloat  ambientLight[] = { 0.5f, 0.5f, 0.5f, 1.0f};
+GLfloat  ambientLight[] = { 0.5f, 0.5f, 0.5f, 0.2f};
 GLfloat  spotDir[] = { 0.0f, 0.0f, -1.0f };
 
 void ProcessMenu(int value)
@@ -149,8 +151,8 @@ void RenderScene(void)
 	switch (object) {
 		case TEAPOT:
 			// Draw Teapot
-			if(wireframe) glutWireTeapot(40.0f);
-			else glutSolidTeapot(40.0f);
+			if(wireframe) glutWireTeapot(teasize);
+			else glutSolidTeapot(teasize);
 			break;
 		case TORUS:
 			// Draw Torus
@@ -218,6 +220,43 @@ void mouse(int button, int state, int x, int y)
   }
 }
 
+void initi()
+{
+	
+	glEnable(GL_DEPTH_TEST);	// Hidden surface removal
+	glFrontFace(GL_CCW);		// Counter clock-wise polygons face out
+	
+	// Setup and enable light 0
+	// Supply a slight ambient light so the objects can be seen
+	glLightModelfv(GL_LIGHT_MODEL_AMBIENT, ambientLight);
+	
+	// The light is composed of just a diffuse and specular components
+	glLightfv(GL_LIGHT0, GL_DIFFUSE, ambientLight);
+	glLightfv(GL_LIGHT0, GL_SPECULAR, specular);
+	glLightfv(GL_LIGHT0, GL_POSITION, lightPos);
+
+	// Specific spot effects
+	// Cut off angle is 50 degrees
+	glLightf(GL_LIGHT0, GL_SPOT_CUTOFF, 50.0f);
+
+	// Enable this light in particular
+	glEnable(GL_LIGHT0);
+
+	// Enable color tracking
+	glEnable(GL_COLOR_MATERIAL);
+	
+	// Set Material properties to follow glColor values
+	glColorMaterial(GL_FRONT, GL_AMBIENT_AND_DIFFUSE);
+
+	// All materials hereafter have full specular reflectivity with a high shine
+	glMaterialfv(GL_FRONT, GL_SPECULAR, specref);
+	glMateriali(GL_FRONT, GL_SHININESS, 128);
+
+	// Black background
+	glClearColor(0.0f, 0.0f, 0.0f, 1.0f );
+}
+
+
 void motion(int x, int y)
 {
 	xspin = (xspin + (x - xbegin)) % 360;
@@ -256,12 +295,14 @@ void keyboard(unsigned char key, int x, int y)
 		case ']':
 			slices++;
 			stacks++;
+			if(object==TEAPOT && teasize<55) {teasize++;}
 			break;
 		case '[':
 			if(slices>3 && stacks>3) {
 				slices--;
 				stacks--;
 			}
+			if(object==TEAPOT && teasize>25) {teasize--;}
 			break;
 		case '1':
 			object = TEAPOT;
@@ -289,6 +330,13 @@ void keyboard(unsigned char key, int x, int y)
 		case 'l':
 		case 'L':
 			lighting = !lighting;
+			break;
+		case 'n':
+		case 'N':
+			if(col==0){ambientLight[0] =  1.0f, ambientLight[1] =0.5f, ambientLight[2] =0.5f, ambientLight[3] =1.0f;init();col=1;}
+			else if(col==1){ambientLight[0] =  0.5f, ambientLight[1] =1.0f, ambientLight[2] =0.5f, ambientLight[3] =1.0f;init();col=2;}
+			else if(col==2){ambientLight[0] =  0.5f, ambientLight[1] =0.5f, ambientLight[2] =1.0f, ambientLight[3] =1.0f;init();col=3;}
+			else {ambientLight[0] =  0.5f, ambientLight[1] =0.5f, ambientLight[2] =0.5f, ambientLight[3] =1.0f;init();col=2;}
 			break;
 		case 27:
 			exit(0);

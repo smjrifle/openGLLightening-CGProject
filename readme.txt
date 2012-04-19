@@ -15,8 +15,9 @@ Features
 	2 -> Torus
 	3 -> Cone
 	4 -> Sphere
-
+	n -> Change Color of object
 
 3D Lighting Effects with OpenGL done by:
 8333 Shaswot Adhikari
 8305 Ashish Kayastha
+095  Smjrifle ;)
