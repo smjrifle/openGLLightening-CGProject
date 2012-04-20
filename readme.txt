@@ -16,6 +16,8 @@ Features
 	3 -> Cone
 	4 -> Sphere
 	n -> Change Color of object
+	o -> Toggle Object Animation
+	p -> Toggle Light Animation
 
 3D Lighting Effects with OpenGL done by:
 8333 Shaswot Adhikari
