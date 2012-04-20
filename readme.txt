@@ -15,6 +15,7 @@ Features
 	2 -> Torus
 	3 -> Cone
 	4 -> Sphere
+	5 -> Cube
 	n -> Change Color of object
 	o -> Toggle Object Animation
 	p -> Toggle Light Animation
