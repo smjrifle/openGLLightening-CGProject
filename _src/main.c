@@ -3,6 +3,7 @@
 //Shailesh Man Joshi (@smjrifle) 1ST09CS085
 
 #include <stdlib.h>
+#include <string.h>
 #include <GL/glut.h> // Header file for Graphics Library Utility Toolkit (GLUT)
 
 // Constants defined for use in the program
@@ -14,7 +15,8 @@
 #define TORUS 5
 #define CONE 6
 #define SPHERE 7
-#define EXIT 8
+#define CUBE 8
+#define EXIT 9
 
 // Default values for the scene
 static int mode = SMOOTH_MODE;
@@ -27,7 +29,9 @@ static int slices = 16;
 static int stacks = 16;
 int col=0;
 float teasize=40.0f;
-
+int cube=45;
+int animi=0;
+int objanimi=0;
 // Rotation amounts
 GLfloat xRot = 0.0f;
 GLfloat yRot = 0.0f;
@@ -39,14 +43,115 @@ GLfloat  specref[] =  { 1.0f, 1.0f, 1.0f, 1.0f };
 GLfloat  ambientLight[] = { 0.5f, 0.5f, 0.5f, 0.2f};
 GLfloat  spotDir[] = { 0.0f, 0.0f, -1.0f };
 
+void Sprint( int x, int y, char *st)
+{
+	int l,i;
+
+	l=strlen( st ); // see how many characters are in text string.
+	glRasterPos2i( x, y); // location to start printing text
+	for( i=0; i < l; i++)  // loop until i is greater then l
+		{
+		glutBitmapCharacter(GLUT_BITMAP_TIMES_ROMAN_24, st[i]); // Print a character on the screen
+	}
+
+}
+
+// This function does any needed initialization on the rendering context
+void init()
+{
+	glEnable(GL_DEPTH_TEST);	// Hidden surface removal
+	glFrontFace(GL_CCW);		// Counter clock-wise polygons face out
+	
+	// Setup and enable light 0
+	// Supply a slight ambient light so the objects can be seen
+	glLightModelfv(GL_LIGHT_MODEL_AMBIENT, ambientLight);
+	
+	// The light is composed of just a diffuse and specular components
+	glLightfv(GL_LIGHT0, GL_DIFFUSE, ambientLight);
+	glLightfv(GL_LIGHT0, GL_SPECULAR, specular);
+	glLightfv(GL_LIGHT0, GL_POSITION, lightPos);
+
+	// Specific spot effects
+	// Cut off angle is 50 degrees
+	glLightf(GL_LIGHT0, GL_SPOT_CUTOFF, 50.0f);
+
+	// Enable this light in particular
+	glEnable(GL_LIGHT0);
+
+	// Enable color tracking
+	glEnable(GL_COLOR_MATERIAL);
+	
+	// Set Material properties to follow glColor values
+	glColorMaterial(GL_FRONT, GL_AMBIENT_AND_DIFFUSE);
+
+	// All materials hereafter have full specular reflectivity with a high shine
+	glMaterialfv(GL_FRONT, GL_SPECULAR, specref);
+	glMateriali(GL_FRONT, GL_SHININESS, 128);
+
+	// Black background
+	glClearColor(0.0f, 0.0f, 0.0f, 1.0f );
+}
+
+void mouse(int button, int state, int x, int y)
+{
+  if (button == GLUT_LEFT_BUTTON && state == GLUT_DOWN) {
+    xbegin = x;
+	ybegin = y;
+  }
+}
+
+void anim()
+{
+	if(animi==1)
+	{
+	
+	if(xRot==360.0f)
+	{
+		
+		if(yRot==360.0f)
+		{
+			xRot=0.0f; yRot=0.0f;
+		}
+		else {yRot+=2.0f;}
+	}
+	else
+	{xRot+=2.0f;}
+	glutPostRedisplay();
+	
+	glutTimerFunc(25,anim,0);
+	}
+	
+}
+void objanim()
+{ 
+	if(objanimi==1)
+	{
+	if(xspin<360)
+	{
+	xspin+=1;
+	}
+	else
+	{	
+		if(object<8)
+		{object+=1;
+		xspin=0;}
+		else
+		{objanimi=0;}
+	}
+	glutPostRedisplay();
+	glutTimerFunc(25,objanim,0);
+	}
+}
 void ProcessMenu(int value)
 {
 	switch(value) {
 		case 0:
 			mode = FLAT_MODE;
+			glutChangeToMenuEntry(1, "Smooth Shading [S]", 1);
 			break;
 		case 1:
 			mode = SMOOTH_MODE;
+			glutChangeToMenuEntry(1, "Flat Shading [S]", 0);
 			break;
 		case 2:
 			wireframe = !wireframe;
@@ -67,8 +172,35 @@ void ProcessMenu(int value)
 			object = SPHERE;
 			break;
 		case 8:
-			exit(0);
-	}
+			object = CUBE;
+			break;
+		case 9:
+			if(col==0){ambientLight[0] =  1.0f, ambientLight[1] =0.5f, ambientLight[2] =0.5f, ambientLight[3] =1.0f;init();col=1;}
+			else if(col==1){ambientLight[0] =  0.3f, ambientLight[1] =1.0f, ambientLight[2] =0.3f, ambientLight[3] =1.0f;init();col=2;}
+			else if(col==2){ambientLight[0] =  0.3f, ambientLight[1] =0.3f, ambientLight[2] =1.0f, ambientLight[3] =1.0f;init();col=3;}
+			else {ambientLight[0] =  0.5f, ambientLight[1] =0.5f, ambientLight[2] =0.5f, ambientLight[3] =1.0f;init();col=0;}
+			break;
+		case 10:
+			exit(0);break;
+		case 11:
+			if(animi==0)
+			{
+				animi=1;
+				glutTimerFunc(1000, anim,1);
+			}
+			else
+				animi=0;
+			break;
+		case 12:
+			if(objanimi==0)
+			{
+				objanimi=1;
+				glutTimerFunc(1000,objanim,1);
+			}
+			else
+				objanimi=0;
+			break;
+		}
 	// Refresh the window
 	glutPostRedisplay();
 }
@@ -151,111 +283,35 @@ void RenderScene(void)
 	switch (object) {
 		case TEAPOT:
 			// Draw Teapot
-			if(wireframe) glutWireTeapot(teasize);
-			else glutSolidTeapot(teasize);
+			if(wireframe) {glutWireTeapot(teasize);Sprint(-15, -65, "Wired Tea Pot"); }
+			else {glutSolidTeapot(teasize);Sprint(-15, -65, "Solid Tea Pot"); }
+			
 			break;
 		case TORUS:
 			// Draw Torus
-			if(wireframe) glutWireTorus(10.0f, 40.0f, slices, stacks);
-			else glutSolidTorus(10.0f, 40.0f, slices, stacks);
+			if(wireframe) {glutWireTorus(10.0f, 40.0f, slices, stacks);Sprint(-15, -65, "Wired Torus"); }
+			else {glutSolidTorus(10.0f, 40.0f, slices, stacks); Sprint(-15, -65, "Solid Torus"); }
 			break;
 		case CONE:
 			// Draw Cone
-			if(wireframe) glutWireCone(40.0f, 70.0f, slices, stacks);
-			else glutSolidCone(40.0f, 70.0f, slices, stacks);
+			if(wireframe) {glutWireCone(40.0f, 70.0f, slices, stacks);Sprint(-15, -65, "Wired Cone"); }
+			else {glutSolidCone(40.0f, 70.0f, slices, stacks);Sprint(-15, -65, "Solid Cone"); }
 			break;
 		case SPHERE:
 			// Draw Sphere
-			if(wireframe) glutWireSphere(40.0f, slices, stacks);
-			glutSolidSphere(40.0f, slices, stacks);
+			if(wireframe) {glutWireSphere(40.0f, slices, stacks);Sprint(-15, -65, "Wired Sphere"); }
+			else {glutSolidSphere(40.0f, slices, stacks);Sprint(-15, -65, "Solid Sphere"); }
 			break;
-	}
+		case CUBE:
+			//Draw Cube
+			if(wireframe) {glutWireCube(cube);Sprint(-15, -65, "Wired Cube"); }
+			else {glutSolidCube(cube);Sprint(-15, -65, "Solid Cube"); }
+	}		
 
 	glPopMatrix();
 	// Display the results
 	glutSwapBuffers();
 }
-
-// This function does any needed initialization on the rendering context
-void init()
-{
-	glEnable(GL_DEPTH_TEST);	// Hidden surface removal
-	glFrontFace(GL_CCW);		// Counter clock-wise polygons face out
-	
-	// Setup and enable light 0
-	// Supply a slight ambient light so the objects can be seen
-	glLightModelfv(GL_LIGHT_MODEL_AMBIENT, ambientLight);
-	
-	// The light is composed of just a diffuse and specular components
-	glLightfv(GL_LIGHT0, GL_DIFFUSE, ambientLight);
-	glLightfv(GL_LIGHT0, GL_SPECULAR, specular);
-	glLightfv(GL_LIGHT0, GL_POSITION, lightPos);
-
-	// Specific spot effects
-	// Cut off angle is 50 degrees
-	glLightf(GL_LIGHT0, GL_SPOT_CUTOFF, 50.0f);
-
-	// Enable this light in particular
-	glEnable(GL_LIGHT0);
-
-	// Enable color tracking
-	glEnable(GL_COLOR_MATERIAL);
-	
-	// Set Material properties to follow glColor values
-	glColorMaterial(GL_FRONT, GL_AMBIENT_AND_DIFFUSE);
-
-	// All materials hereafter have full specular reflectivity with a high shine
-	glMaterialfv(GL_FRONT, GL_SPECULAR, specref);
-	glMateriali(GL_FRONT, GL_SHININESS, 128);
-
-	// Black background
-	glClearColor(0.0f, 0.0f, 0.0f, 1.0f );
-}
-
-void mouse(int button, int state, int x, int y)
-{
-  if (button == GLUT_LEFT_BUTTON && state == GLUT_DOWN) {
-    xbegin = x;
-	ybegin = y;
-  }
-}
-
-void initi()
-{
-	
-	glEnable(GL_DEPTH_TEST);	// Hidden surface removal
-	glFrontFace(GL_CCW);		// Counter clock-wise polygons face out
-	
-	// Setup and enable light 0
-	// Supply a slight ambient light so the objects can be seen
-	glLightModelfv(GL_LIGHT_MODEL_AMBIENT, ambientLight);
-	
-	// The light is composed of just a diffuse and specular components
-	glLightfv(GL_LIGHT0, GL_DIFFUSE, ambientLight);
-	glLightfv(GL_LIGHT0, GL_SPECULAR, specular);
-	glLightfv(GL_LIGHT0, GL_POSITION, lightPos);
-
-	// Specific spot effects
-	// Cut off angle is 50 degrees
-	glLightf(GL_LIGHT0, GL_SPOT_CUTOFF, 50.0f);
-
-	// Enable this light in particular
-	glEnable(GL_LIGHT0);
-
-	// Enable color tracking
-	glEnable(GL_COLOR_MATERIAL);
-	
-	// Set Material properties to follow glColor values
-	glColorMaterial(GL_FRONT, GL_AMBIENT_AND_DIFFUSE);
-
-	// All materials hereafter have full specular reflectivity with a high shine
-	glMaterialfv(GL_FRONT, GL_SPECULAR, specref);
-	glMateriali(GL_FRONT, GL_SHININESS, 128);
-
-	// Black background
-	glClearColor(0.0f, 0.0f, 0.0f, 1.0f );
-}
-
 
 void motion(int x, int y)
 {
@@ -289,19 +345,25 @@ void SpecialKeys(int key, int x, int y)
 	glutPostRedisplay();
 }
 
+
+
 void keyboard(unsigned char key, int x, int y)
 {
     switch(key) {
 		case ']':
-			slices++;
-			stacks++;
+			if(object==CUBE && cube<80) {cube++;}
+			else{slices++;
+			stacks++;}
 			if(object==TEAPOT && teasize<55) {teasize++;}
+			
 			break;
 		case '[':
+			if(object==CUBE && cube>20) {cube--;}
+			else{
 			if(slices>3 && stacks>3) {
 				slices--;
 				stacks--;
-			}
+			}}
 			if(object==TEAPOT && teasize>25) {teasize--;}
 			break;
 		case '1':
@@ -315,6 +377,9 @@ void keyboard(unsigned char key, int x, int y)
 			break;
 		case '4':
 			object = SPHERE;
+			break;
+		case '5':
+			object = CUBE;
 			break;
 		case 's':
 		case 'S':
@@ -334,9 +399,29 @@ void keyboard(unsigned char key, int x, int y)
 		case 'n':
 		case 'N':
 			if(col==0){ambientLight[0] =  1.0f, ambientLight[1] =0.5f, ambientLight[2] =0.5f, ambientLight[3] =1.0f;init();col=1;}
-			else if(col==1){ambientLight[0] =  0.5f, ambientLight[1] =1.0f, ambientLight[2] =0.5f, ambientLight[3] =1.0f;init();col=2;}
-			else if(col==2){ambientLight[0] =  0.5f, ambientLight[1] =0.5f, ambientLight[2] =1.0f, ambientLight[3] =1.0f;init();col=3;}
-			else {ambientLight[0] =  0.5f, ambientLight[1] =0.5f, ambientLight[2] =0.5f, ambientLight[3] =1.0f;init();col=2;}
+			else if(col==1){ambientLight[0] =  0.3f, ambientLight[1] =1.0f, ambientLight[2] =0.3f, ambientLight[3] =1.0f;init();col=2;}
+			else if(col==2){ambientLight[0] =  0.3f, ambientLight[1] =0.3f, ambientLight[2] =1.0f, ambientLight[3] =1.0f;init();col=3;}
+			else {ambientLight[0] =  0.5f, ambientLight[1] =0.5f, ambientLight[2] =0.5f, ambientLight[3] =1.0f;init();col=0;}
+			break;
+		case 'o':
+		case 'O':
+			if(objanimi==0)
+			{
+				objanimi=1;
+				glutTimerFunc(1000,objanim,1);
+			}
+			else
+				objanimi=0;
+			break;
+		case 'p':
+		case 'P':
+			if(animi==0)
+			{
+				animi=1;
+				glutTimerFunc(1000, anim,1);
+			}
+			else
+				animi=0;
 			break;
 		case 27:
 			exit(0);
@@ -374,24 +459,32 @@ void ChangeSize(int w, int h)
 int main(int argc, char* argv[])
 {
 	glutInit(&argc, argv);
+	printf("Open GL LIGHTING\nFunctions:\n\t\'S\' ->Toggle Shading\n\t\'W\' ->Toggle Wireframe/Solid\n\t\'L\' ->Toggle Lightening");
+	printf("\n\t\'1\' ->Teapot\n\t\'2\' ->Torus\n\t\'3\' ->Cone\n\t\'4\' ->Sphere\n\t\'5\' ->Cube\n\t\'N\' ->Change Color");
+	printf("\n\t\'P\' ->Toggle Light Animation\n\t\'O\' ->Toggle Object Animation\n\n");
 	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH);
 	glutInitWindowSize(800, 600);
 	glutCreateWindow("3D Lighting Effects with OpenGL");
 
 	// Create the Menu
 	glutCreateMenu(ProcessMenu);
-	glutAddMenuEntry("Flat Shading", FLAT_MODE);
-	glutAddMenuEntry("Smooth Shading", SMOOTH_MODE);
-	glutAddMenuEntry("Toggle Wireframe [W]", WIREFRAME);
+//	if(mode == SMOOTH_MODE)
+	glutAddMenuEntry("Flat Shading[S]", FLAT_MODE);
+//	else
+//	glutAddMenuEntry("Smooth Shading[S]", SMOOTH_MODE);
+	glutAddMenuEntry("Toggle Wireframe/Solid [W]", WIREFRAME);
 	glutAddMenuEntry("Toggle Lighting [L]", LIGHTING);
 	glutAddMenuEntry("Teapot [1]", TEAPOT);
 	glutAddMenuEntry("Torus [2]", TORUS);
 	glutAddMenuEntry("Cone [3]", CONE);
 	glutAddMenuEntry("Sphere [4]", SPHERE);
-	glutAddMenuEntry("Exit [ESC]", EXIT);
+	glutAddMenuEntry("Cube [5]", 8);
+	glutAddMenuEntry("Change Color [N]", 9);
+	glutAddMenuEntry("Toggle Light Animation [P]", 11);
+	glutAddMenuEntry("Toggle Object Animation [O]", 12);
+	glutAddMenuEntry("Exit [ESC]", 10);
 	glutAttachMenu(GLUT_RIGHT_BUTTON);
-    
-	glutReshapeFunc(ChangeSize);
+    glutReshapeFunc(ChangeSize);
 	glutSpecialFunc(SpecialKeys);
 	glutKeyboardFunc(keyboard);
 	glutMouseFunc(mouse);
