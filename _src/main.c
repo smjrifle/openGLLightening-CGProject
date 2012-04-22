@@ -2,6 +2,7 @@
 //Saurav Raj 1ST09CS091
 //Shailesh Man Joshi (@smjrifle) 1ST09CS085
 
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <GL/glut.h> // Header file for Graphics Library Utility Toolkit (GLUT)
@@ -32,6 +33,15 @@ float teasize=40.0f;
 int cube=45;
 int animi=0;
 int objanimi=0;
+float x1=0;
+float x2=0,y2=0,z2=0;
+int color_anim=0;
+int ch=1;
+int x10=0;
+int y10=0;
+int replay=0, resume=0;
+int s1[1000],s2[1000],s3[1000],topy=0, topx=0,top=0;
+
 // Rotation amounts
 GLfloat xRot = 0.0f;
 GLfloat yRot = 0.0f;
@@ -100,6 +110,43 @@ void mouse(int button, int state, int x, int y)
   }
 }
 
+void repla()
+{
+	if(replay==1){if(s3[top++]==1) {x10=s2[topx++]; }else {y10=s1[topy++]; }
+	glutSwapBuffers();glutPostRedisplay();glutTimerFunc(100, repla,1);
+	}
+}
+
+void moves()
+{
+	if(resume==1) Sprint(-10, 68, "Replay, Press 'X' to resume");
+	if(replay==1 && y10!=120) Sprint(-10, 68,"Replay, Press 'Z' to stop");
+	if(y10>=120 && x10>42)
+	{	
+		Sprint(-10, 68, "Finish"); glColor3f(0.0,0.0,1.0);
+		glBegin(GL_POLYGON);
+		glVertex2f(-3+x10,-65+y10);
+		glVertex2f(3+x10,-65+y10);
+		glVertex2f(3+x10,-55+y10);
+		glVertex2f(-3+x10,-55+y10);
+		glEnd();
+		topy=0;topx=0;top=0;x10=0;y10=0;
+		if(replay==0){replay=1;
+		glutTimerFunc(1000, repla,1);}
+		else{replay=0;}
+	}
+	else
+	{
+	glColor3f(1.0,0.0,0.0);
+	glBegin(GL_POLYGON);
+	glVertex2f(-3+x10,-65+y10);
+	glVertex2f(3+x10,-65+y10);
+	glVertex2f(3+x10,-55+y10);
+	glVertex2f(-3+x10,-55+y10);
+	glEnd();
+	}
+}
+
 void anim()
 {
 	if(animi==1)
@@ -142,16 +189,83 @@ void objanim()
 	glutTimerFunc(25,objanim,0);
 	}
 }
+void coloranim()
+{	if(color_anim==1)
+{
+	if(x2==0 && y2==0 && z2==0) {x2=1.0;}
+	else if(x2==1 && y2==0 && z2==0) {x2=0.0; y2=1.0;}
+	else if(x2==0 && y2==1 && z2==0) {z2=1.0;y2=0;}
+	else if(x2==0 && y2==0 && z2==1) {x2=0.5;y2=0.5;z2=0.5;}
+	else if(x2==0.5){x2=0.1;y2=0.3;z2=0.7;}
+	else if(z2==0.7){x2=0.1;y2=0.7;z2=0.3;}
+	else if(y2==0.7){x2=0.7;y2=0.1;z2=0.3;}
+	else {x2=0;y2=0;z2=0;}
+	ambientLight[0] =  x2, ambientLight[1] =y2, ambientLight[2] =z2, ambientLight[3] =1.0f;init();
+	glutPostRedisplay();
+	glutTimerFunc(500,coloranim,0);
+}	
+}
+void blueanim()
+{if(x1<0.7){ambientLight[0] =  0.0f, ambientLight[1] =0.0f, ambientLight[2] =x1, ambientLight[3] =1.0f;col=0;x1+=0.1;init();
+	glutPostRedisplay();
+	glutTimerFunc(1000,blueanim,0);}
+}
+void greenanim()
+{if(x1<0.7){ambientLight[0] =  0.0f, ambientLight[1] =x1, ambientLight[2] =0.0f, ambientLight[3] =1.0f;col=2;x1+=0.1;init();
+	glutPostRedisplay();
+	glutTimerFunc(1000,greenanim,0);}
+}
+void redanim()
+{if(x1<0.7){ambientLight[0] =  x1, ambientLight[1] =0.0f, ambientLight[2] =0.0f, ambientLight[3] =1.0f;col=1;x1+=0.1;init();
+	glutPostRedisplay();
+	glutTimerFunc(1000,redanim,0);}
+}
+
+void displa(void)
+{
+	
+	glClear(GL_COLOR_BUFFER_BIT);
+			moves();
+			glColor3f(1.0,1.0,1.0);
+		
+		glBegin(GL_POLYGON);
+	glVertex2f(40,-25);
+	glVertex2f(65,-25);
+	glVertex2f(65,65);
+	glVertex2f(40,65);
+	glEnd();
+	
+		
+	glBegin(GL_POLYGON);
+	glVertex2f(-10,-65);
+	glVertex2f(-10,-25);
+	glVertex2f(10,-25);
+	glVertex2f(10,-65);
+	glEnd();
+	glBegin(GL_POLYGON);
+	glVertex2f(-10,-25);
+	glVertex2f(40,-25);
+	glVertex2f(40,5);
+	glVertex2f(-10,5);
+	glEnd();
+glColor3f(0.0,1.0,0.0);
+	glBegin(GL_POLYGON);
+	glVertex2f(-65,-65);
+	glVertex2f(-65,65);
+	glVertex2f(65,65);
+	glVertex2f(65,-65);
+	glEnd();}
+
 void ProcessMenu(int value)
 {
 	switch(value) {
 		case 0:
 			mode = FLAT_MODE;
-			glutChangeToMenuEntry(1, "Smooth Shading [S]", 1);
+			glutChangeToMenuEntry(1, "Smooth Shading [Y]", 1);
 			break;
 		case 1:
 			mode = SMOOTH_MODE;
-			glutChangeToMenuEntry(1, "Flat Shading [S]", 0);
+			glutChangeToMenuEntry(1, "Flat Shading [Y]", 0);
 			break;
 		case 2:
 			wireframe = !wireframe;
@@ -200,10 +314,22 @@ void ProcessMenu(int value)
 			else
 				objanimi=0;
 			break;
+		case 13:
+				if(color_anim==0)
+			{
+				color_anim=1;
+			glutTimerFunc(1000, coloranim,1);
+			}
+			else
+				color_anim=0;
+			break;
+		case 14:object=27;break;
+
 		}
 	// Refresh the window
 	glutPostRedisplay();
 }
+
 
 // Function to draw the scene
 void RenderScene(void)
@@ -244,12 +370,12 @@ void RenderScene(void)
 			glPushAttrib(GL_LIGHTING_BIT);
 				glEnable(GL_LIGHTING);
 				// Draw a red cone to enclose the light source
-				glutSolidCone(4.0f, 6.0f, 15, 15);
+			if(object!=27)	glutSolidCone(4.0f, 6.0f, 15, 15);
 			glPopAttrib();
 		}
 		else {
 			// Draw a red cone to enclose the light source
-			glutSolidCone(4.0f, 6.0f, 15, 15);
+			if(object!=27) glutSolidCone(4.0f, 6.0f, 15, 15);
 		}
         // Draw a smaller displaced sphere to denote the light bulb
         // Save the lighting state variables
@@ -258,10 +384,10 @@ void RenderScene(void)
             // Turn off lighting and specify a bright yellow sphere
             glDisable(GL_LIGHTING);
             if(lighting)
-				glColor3ub(255, 255, 0);
+			glColor3ub(255, 255, 0);
 			else
-				glColor3f(0.75f, 0.75f, 0.75f);
-            glutSolidSphere(3.0f, 15, 15);
+			glColor3f(0.75f, 0.75f, 0.75f);
+		if(object!=27) glutSolidSphere(3.0f, 15, 15);
 
         // Restore lighting state variables
         glPopAttrib();
@@ -306,6 +432,10 @@ void RenderScene(void)
 			//Draw Cube
 			if(wireframe) {glutWireCube(cube);Sprint(-15, -65, "Wired Cube"); }
 			else {glutSolidCube(cube);Sprint(-15, -65, "Solid Cube"); }
+			break;
+		default:
+		displa();break;
+			
 	}		
 
 	glPopMatrix();
@@ -381,15 +511,15 @@ void keyboard(unsigned char key, int x, int y)
 		case '5':
 			object = CUBE;
 			break;
-		case 's':
-		case 'S':
+		case 'y':
+		case 'Y':
 			if(mode == SMOOTH_MODE)
 				mode = FLAT_MODE;
 			else
 				mode = SMOOTH_MODE;
 			break;
-		case 'w':
-		case 'W':
+		case 'u':
+		case 'U':
 			wireframe = !wireframe;
 			break;
 		case 'l':
@@ -398,7 +528,7 @@ void keyboard(unsigned char key, int x, int y)
 			break;
 		case 'n':
 		case 'N':
-			if(col==0){ambientLight[0] =  1.0f, ambientLight[1] =0.5f, ambientLight[2] =0.5f, ambientLight[3] =1.0f;init();col=1;}
+			if(col==0){ambientLight[0] =  1.0f, ambientLight[1] =0.4f, ambientLight[2] =0.4f, ambientLight[3] =1.0f;init();col=1;}
 			else if(col==1){ambientLight[0] =  0.3f, ambientLight[1] =1.0f, ambientLight[2] =0.3f, ambientLight[3] =1.0f;init();col=2;}
 			else if(col==2){ambientLight[0] =  0.3f, ambientLight[1] =0.3f, ambientLight[2] =1.0f, ambientLight[3] =1.0f;init();col=3;}
 			else {ambientLight[0] =  0.5f, ambientLight[1] =0.5f, ambientLight[2] =0.5f, ambientLight[3] =1.0f;init();col=0;}
@@ -423,6 +553,38 @@ void keyboard(unsigned char key, int x, int y)
 			else
 				animi=0;
 			break;
+		case 'b':
+		case 'B':
+			x1=0;
+			glutTimerFunc(1000, blueanim,1);
+			break;
+		case 'r':
+		case 'R':
+			x1=0;
+			glutTimerFunc(1000, redanim,1);
+			break;
+		case 'g':
+		case 'G':
+			x1=0;
+			glutTimerFunc(1000, greenanim,1);
+			break;
+		case 'c':
+		case 'C':
+			if(color_anim==0)
+			{
+				color_anim=1;
+			glutTimerFunc(1000, coloranim,1);
+			}
+			else
+				color_anim=0;
+			break;
+		case 'w': if(replay!=1)if(y10<120){if((x10<20&&y10<60)||(x10>42 && x10<120 || y10<60)){y10++; s1[topy++]=y10;s3[top++]=0;}}break;
+		case 'a': if(replay!=1) if((y10<61 && x10>-7)||(y10>65&&x10>43)){x10--;s3[top++]=1;s2[topx++]=x10;}break;
+		case 's': if(replay!=1)if((y10>0 && x10<8 )|| (x10>7 && y10>40)){y10--;s3[top++]=0;s1[topy++]=y10;}break;
+		case 'd': if(replay!=1)if((x10<7 && y10<39) || (x10<62 && y10>39)){x10++;s2[topx++]=x10;s3[top++]=1;}break;
+		case 'z':replay=0;resume=1;break;
+		case 'x':replay=1;resume=0;glutTimerFunc(100, repla,1);break;
+		case 54:object=27;break;
 		case 27:
 			exit(0);
 	}
@@ -459,29 +621,31 @@ void ChangeSize(int w, int h)
 int main(int argc, char* argv[])
 {
 	glutInit(&argc, argv);
-	printf("Open GL LIGHTING\nFunctions:\n\t\'S\' ->Toggle Shading\n\t\'W\' ->Toggle Wireframe/Solid\n\t\'L\' ->Toggle Lightening");
-	printf("\n\t\'1\' ->Teapot\n\t\'2\' ->Torus\n\t\'3\' ->Cone\n\t\'4\' ->Sphere\n\t\'5\' ->Cube\n\t\'N\' ->Change Color");
-	printf("\n\t\'P\' ->Toggle Light Animation\n\t\'O\' ->Toggle Object Animation\n\n");
+	printf("Open GL LIGHTING\nFunctions:\n\t\'Y\' ->Toggle Shading\n\t\'U\' ->Toggle Wireframe/Solid\n\t\'L\' ->Toggle Lightening");
+	printf("\n\t\'1\' ->Teapot\n\t\'2\' ->Torus\n\t\'3\' ->Cone\n\t\'4\' ->Sphere\n\t\'5\' ->Cube\n\t\'6\' ->Demo Mode\n\t\'N\' ->Change Color");
+	printf("\n\t\'P\' ->Toggle Light Animation\n\t\'O\' ->Toggle Object Animation\n\t\'R\' ->Red Color\n\t\'G\' ->Green Color\n\t\'B\' ->Blue Color\n\t\'C\' ->Color Animation\n\t\'Esc\' ->Exit\n");
+	printf("\nDEMO MODE:\n\t\'W\' ->UP\t\'S\' ->Down\t\'A\' ->Left\t\'D\' ->Right\n\t\'Z\' ->Pause\t\'X\' ->Resume\n");
 	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH);
 	glutInitWindowSize(800, 600);
 	glutCreateWindow("3D Lighting Effects with OpenGL");
-
 	// Create the Menu
 	glutCreateMenu(ProcessMenu);
 //	if(mode == SMOOTH_MODE)
-	glutAddMenuEntry("Flat Shading[S]", FLAT_MODE);
+	glutAddMenuEntry("Flat Shading[Y]", FLAT_MODE);
 //	else
 //	glutAddMenuEntry("Smooth Shading[S]", SMOOTH_MODE);
-	glutAddMenuEntry("Toggle Wireframe/Solid [W]", WIREFRAME);
+	glutAddMenuEntry("Toggle Wireframe/Solid [U]", WIREFRAME);
 	glutAddMenuEntry("Toggle Lighting [L]", LIGHTING);
 	glutAddMenuEntry("Teapot [1]", TEAPOT);
 	glutAddMenuEntry("Torus [2]", TORUS);
 	glutAddMenuEntry("Cone [3]", CONE);
 	glutAddMenuEntry("Sphere [4]", SPHERE);
 	glutAddMenuEntry("Cube [5]", 8);
+	glutAddMenuEntry("Demo Mode [6]", 14);
 	glutAddMenuEntry("Change Color [N]", 9);
 	glutAddMenuEntry("Toggle Light Animation [P]", 11);
 	glutAddMenuEntry("Toggle Object Animation [O]", 12);
+	glutAddMenuEntry("Toggle Color Animation [C]", 13);
 	glutAddMenuEntry("Exit [ESC]", 10);
 	glutAttachMenu(GLUT_RIGHT_BUTTON);
     glutReshapeFunc(ChangeSize);
