@@ -113,7 +113,7 @@ void mouse(int button, int state, int x, int y)
 void repla()
 {
 	if(replay==1){if(s3[top++]==1) {x10=s2[topx++]; }else {y10=s1[topy++]; }
-	glutSwapBuffers();glutPostRedisplay();glutTimerFunc(100, repla,1);
+	glutPostRedisplay();glutTimerFunc(100, repla,1);
 	}
 }
 
