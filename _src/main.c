@@ -28,6 +28,7 @@ static int xbegin, ybegin;
 static int object = TEAPOT;
 static int slices = 16;
 static int stacks = 16;
+//used for animation and moves
 int col=0;
 float teasize=40.0f;
 int cube=45;
@@ -109,21 +110,23 @@ void mouse(int button, int state, int x, int y)
 	ybegin = y;
   }
 }
-
+//Function for replay in demo mode
 void repla()
 {
 	if(replay==1){if(s3[top++]==1) {x10=s2[topx++]; }else {y10=s1[topy++]; }
 	glutPostRedisplay();glutTimerFunc(100, repla,1);
 	}
 }
-
+//Moves for Replay in demo mode, Object Moves using the following Co-ordinates x10 and y10
 void moves()
-{
+{	
 	if(resume==1) Sprint(-10, 68, "Replay, Press 'X' to resume");
 	if(replay==1 && y10!=120) Sprint(-10, 68,"Replay, Press 'Z' to stop");
-	if(y10>=120 && x10>42)
+	//Replay Moves when finished and blue color
+	if(y10>=120 && x10>42
+		)
 	{	
-		Sprint(-10, 68, "Finish"); glColor3f(0.0,0.0,1.0);
+		glColor3f(0.0,0.0,1.0);
 		glBegin(GL_POLYGON);
 		glVertex2f(-3+x10,-65+y10);
 		glVertex2f(3+x10,-65+y10);
@@ -135,6 +138,7 @@ void moves()
 		glutTimerFunc(1000, repla,1);}
 		else{replay=0;}
 	}
+	//Replay Moves before finish and Red Color
 	else
 	{
 	glColor3f(1.0,0.0,0.0);
@@ -147,6 +151,7 @@ void moves()
 	}
 }
 
+//Function to Animate Light Source
 void anim()
 {
 	if(animi==1)
@@ -154,7 +159,7 @@ void anim()
 	
 	if(xRot==360.0f)
 	{
-		
+		//Change Rotation Co-Ordinate
 		if(yRot==360.0f)
 		{
 			xRot=0.0f; yRot=0.0f;
@@ -169,8 +174,9 @@ void anim()
 	}
 	
 }
+//Function to Animate Object
 void objanim()
-{ 
+{	
 	if(objanimi==1)
 	{
 	if(xspin<360)
@@ -189,6 +195,7 @@ void objanim()
 	glutTimerFunc(25,objanim,0);
 	}
 }
+//Function to animate color
 void coloranim()
 {	if(color_anim==1)
 {
@@ -205,6 +212,7 @@ void coloranim()
 	glutTimerFunc(500,coloranim,0);
 }	
 }
+//Individual Color Animation Functions
 void blueanim()
 {if(x1<0.7){ambientLight[0] =  0.0f, ambientLight[1] =0.0f, ambientLight[2] =x1, ambientLight[3] =1.0f;col=0;x1+=0.1;init();
 	glutPostRedisplay();
@@ -220,22 +228,21 @@ void redanim()
 	glutPostRedisplay();
 	glutTimerFunc(1000,redanim,0);}
 }
-
+//Display for Demo Mode
 void displa(void)
 {
-	
+	xspin=0;yspin=0;
 	glClear(GL_COLOR_BUFFER_BIT);
-			moves();
-			glColor3f(1.0,1.0,1.0);
-		
-		glBegin(GL_POLYGON);
+	//Function for Object to be Moved
+	moves();
+	//Create Path for Demo Mode
+	glColor3f(1.0,1.0,1.0);
+	glBegin(GL_POLYGON);
 	glVertex2f(40,-25);
 	glVertex2f(65,-25);
 	glVertex2f(65,65);
 	glVertex2f(40,65);
 	glEnd();
-	
-		
 	glBegin(GL_POLYGON);
 	glVertex2f(-10,-65);
 	glVertex2f(-10,-25);
@@ -248,19 +255,23 @@ void displa(void)
 	glVertex2f(40,5);
 	glVertex2f(-10,5);
 	glEnd();
-glColor3f(0.0,1.0,0.0);
+	glColor3f(0.0,1.0,0.0);
 	glBegin(GL_POLYGON);
 	glVertex2f(-65,-65);
 	glVertex2f(-65,65);
 	glVertex2f(65,65);
 	glVertex2f(65,-65);
-	glEnd();}
-
+	glEnd();
+	glColor3f(1.0,0.0,0.0);
+	
+}
+//Function for Menu
 void ProcessMenu(int value)
 {
 	switch(value) {
 		case 0:
 			mode = FLAT_MODE;
+			//Change Entry in Menu
 			glutChangeToMenuEntry(1, "Smooth Shading [Y]", 1);
 			break;
 		case 1:
@@ -289,14 +300,17 @@ void ProcessMenu(int value)
 			object = CUBE;
 			break;
 		case 9:
+			//Change Color
 			if(col==0){ambientLight[0] =  1.0f, ambientLight[1] =0.5f, ambientLight[2] =0.5f, ambientLight[3] =1.0f;init();col=1;}
 			else if(col==1){ambientLight[0] =  0.3f, ambientLight[1] =1.0f, ambientLight[2] =0.3f, ambientLight[3] =1.0f;init();col=2;}
 			else if(col==2){ambientLight[0] =  0.3f, ambientLight[1] =0.3f, ambientLight[2] =1.0f, ambientLight[3] =1.0f;init();col=3;}
 			else {ambientLight[0] =  0.5f, ambientLight[1] =0.5f, ambientLight[2] =0.5f, ambientLight[3] =1.0f;init();col=0;}
 			break;
 		case 10:
+			//Quit
 			exit(0);break;
 		case 11:
+			//Animate Light Source
 			if(animi==0)
 			{
 				animi=1;
@@ -306,6 +320,7 @@ void ProcessMenu(int value)
 				animi=0;
 			break;
 		case 12:
+			//Object Animation
 			if(objanimi==0)
 			{
 				objanimi=1;
@@ -315,7 +330,8 @@ void ProcessMenu(int value)
 				objanimi=0;
 			break;
 		case 13:
-				if(color_anim==0)
+			//Color Animation
+			if(color_anim==0)
 			{
 				color_anim=1;
 			glutTimerFunc(1000, coloranim,1);
@@ -323,7 +339,9 @@ void ProcessMenu(int value)
 			else
 				color_anim=0;
 			break;
-		case 14:object=27;break;
+		case 14:
+			//Demo Mode
+			object=27;break;
 
 		}
 	// Refresh the window
@@ -403,6 +421,7 @@ void RenderScene(void)
 
 	glPushMatrix();	
     // Rotate coordinate system
+	if(object==27) {xspin=0;yspin=0;}
     glRotatef(xspin, 0.0f, 1.0f, 0.0f);
 	glRotatef(yspin, 1.0f, 0.0f, 0.0f);
 
@@ -434,7 +453,8 @@ void RenderScene(void)
 			else {glutSolidCube(cube);Sprint(-15, -65, "Solid Cube"); }
 			break;
 		default:
-		displa();break;
+			//Draw Demo Mode
+			displa();break;
 			
 	}		
 
@@ -442,18 +462,20 @@ void RenderScene(void)
 	// Display the results
 	glutSwapBuffers();
 }
-
+//Function for spining Object
 void motion(int x, int y)
-{
+{	if(object==27)
+{xspin=0;yspin=0;}
+else{
 	xspin = (xspin + (x - xbegin)) % 360;
 	xbegin = x;
 	yspin = (yspin + (y - ybegin)) % 360;
 	ybegin = y;
-
+}
 	// Refresh the window
 	glutPostRedisplay();
 }
-
+//Function for Rotating Light source
 void SpecialKeys(int key, int x, int y)
 {
     switch(key) {
@@ -479,6 +501,7 @@ void SpecialKeys(int key, int x, int y)
 
 void keyboard(unsigned char key, int x, int y)
 {
+	//Increase and Decrease Number of Slices in Object
     switch(key) {
 		case ']':
 			if(object==CUBE && cube<80) {cube++;}
@@ -623,7 +646,7 @@ int main(int argc, char* argv[])
 	glutInit(&argc, argv);
 	printf("Open GL LIGHTING\nFunctions:\n\t\'Y\' ->Toggle Shading\n\t\'U\' ->Toggle Wireframe/Solid\n\t\'L\' ->Toggle Lightening");
 	printf("\n\t\'1\' ->Teapot\n\t\'2\' ->Torus\n\t\'3\' ->Cone\n\t\'4\' ->Sphere\n\t\'5\' ->Cube\n\t\'6\' ->Demo Mode\n\t\'N\' ->Change Color");
-	printf("\n\t\'P\' ->Toggle Light Animation\n\t\'O\' ->Toggle Object Animation\n\t\'R\' ->Red Color\n\t\'G\' ->Green Color\n\t\'B\' ->Blue Color\n\t\'C\' ->Color Animation\n\t\'Esc\' ->Exit\n");
+	printf("\n\t\'P\' ->Toggle Light Animation\n\t\'O\' ->Toggle Object Animation\n\t\'R\' ->Red Color\n\t\'G\' ->Green Color\n\t\'B\' ->Blue Color\n\t\'C\' ->Color Animation\n\t\'[\' and \']\' ->Increase or Decrease Size\n\n\t\'Esc\' ->Exit\n");
 	printf("\nDEMO MODE:\n\t\'W\' ->UP\t\'S\' ->Down\t\'A\' ->Left\t\'D\' ->Right\n\t\'Z\' ->Pause\t\'X\' ->Resume\n");
 	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH);
 	glutInitWindowSize(800, 600);
