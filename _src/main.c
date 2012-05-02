@@ -1,6 +1,4 @@
 // Computer Graphics Project - "Object Lighting"
-//Saurav Raj 1ST09CS091
-//Shailesh Man Joshi (@smjrifle) 1ST09CS085
 
 #include <stdio.h>
 #include <stdlib.h>
